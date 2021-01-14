@@ -11,10 +11,11 @@ fn owned_kitties_can_append_values() {
         // assert_ok!(Balances::transfer(Origin::signed(10), 20, 1));
         Balances::deposit_creating(&1, 100);
         assert_ok!(KittiesModule::create(Origin::signed(1)));
+        assert_ok!(KittiesModule::create(Origin::signed(1)));
 
         assert_eq!(KittiesModule::lock_id(0), 0); // test lock_id
-        assert_eq!(KittiesModule::lock_index(), 1); // test lock_index
-        assert_eq!(KittiesModule::kitties_count(), 1); // test count
+        assert_eq!(KittiesModule::lock_index(), 2); // test lock_index
+        assert_eq!(KittiesModule::kitties_count(), 2); // test count
         assert_eq!(KittiesModule::kitty_owners(0), Some(1)); // test owner
         assert_eq!(Balances::usable_balance(&1), 95); // test lock
 
@@ -28,7 +29,7 @@ fn owned_kitties_can_append_values() {
         // );
         assert_eq!(
             last_event(),
-            TestEvent::simple_event(RawEvent::Created(1, 0))
+            TestEvent::simple_event(RawEvent::Created(1, 1))
         );
     })
 }
@@ -64,6 +65,7 @@ fn create_kitties_when_lock_max() {
 fn create_kitties_when_balance_not_enough() {
     new_test_ext().execute_with(|| {
         run_to_block(10);
+        Balances::deposit_creating(&1, 1);
         assert_noop!(
             KittiesModule::create(Origin::signed(1)),
             Error::<Test>::FreeNotEnough

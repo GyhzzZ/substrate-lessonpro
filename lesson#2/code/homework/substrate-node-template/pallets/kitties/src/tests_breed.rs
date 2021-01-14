@@ -1,7 +1,6 @@
 use super::*;
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
-use frame_system::{EventRecord, Phase, RawOrigin};
 
 //繁殖kitty成功
 #[test]
@@ -11,6 +10,7 @@ fn breed_kitties_work() {
         Balances::deposit_creating(&1, 100);
         assert_ok!(KittiesModule::create(Origin::signed(1)));
         assert_ok!(KittiesModule::create(Origin::signed(1)));
+        assert_eq!(KittiesModule::lock_id(0), 0); // test lock_id
         assert_eq!(KittiesModule::lock_id(1), 1); // test lock_id
         assert_eq!(KittiesModule::lock_index(), 2); // test lock_index
 
@@ -50,11 +50,17 @@ fn breed_kitties_when_balance_not_enough() {
         Balances::deposit_creating(&1, 100);
         assert_ok!(KittiesModule::create(Origin::signed(1)));
         assert_ok!(KittiesModule::create(Origin::signed(1)));
-        Balances::transfer(Origin::signed(1), 2, 1);
+        assert_ok!(Balances::transfer(Origin::signed(1), 2, 1));
+        // assert_eq!(KittiesModule::lock_id(0), 0); // test lock_id
+        // assert_eq!(KittiesModule::lock_id(1), 1); // test lock_id
+        // assert_eq!(KittiesModule::lock_index(), 2); // test lock_index
+        // assert_eq!(KittiesModule::next_lock_index(), Ok(2));
+
         assert_noop!(
             KittiesModule::breed(Origin::signed(2), 0, 1),
             Error::<Test>::FreeNotEnough
         );
+        // assert_ok!(KittiesModule::breed(Origin::signed(2), 0, 1));
     })
 }
 

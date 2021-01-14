@@ -60,7 +60,7 @@ decl_storage! {
         pub KittyOwners get(fn kitty_owners): map hasher(blake2_128_concat) T::KittyIndex => Option<T::AccountId>;
         pub UserKitties get(fn user_kitties): map hasher(blake2_128_concat) T::AccountId => Vec<T::KittyIndex>;
         pub KittyRelations get(fn kitty_relations): map hasher(blake2_128_concat) T::KittyIndex => KittyRelation<T::KittyIndex>;
-        pub LockIndex get(fn lock_index): u32;
+        pub LockIndexd get(fn lock_index): u32;
         pub LockId get(fn lock_id): map hasher(blake2_128_concat) T::KittyIndex => u32;
     }
 }
@@ -118,6 +118,7 @@ decl_module! {
             let dna = Self::random_value(&sender);
             let kitty = Kitty(dna);
             Self::insert_kitty(&sender, kitty_id, kitty);
+            Self::set_lock_index(lock_id + 1);
             Self::deposit_event(RawEvent::Created(sender,kitty_id));
             Ok(())
         }
@@ -135,13 +136,16 @@ decl_module! {
         #[weight = 0]
         pub fn breed(origin, kitty_id_1: T::KittyIndex, kitty_id_2: T::KittyIndex) -> dispatch::DispatchResult {
             let sender = ensure_signed(origin)?;
-            let lock_id = Self::next_lock_index()?;
+            let lock_id: u32 = Self::next_lock_index()?;
+            // ensure!(1==2,Error::<T>::FreeNotEnough);
             //检查余额
             Self::check_balance(&sender)?;
+
             //繁殖
             let new_kitty_id = Self::do_breed(&sender, kitty_id_1, kitty_id_2)?;
             //质押token
             Self::lock_token(&sender,new_kitty_id,lock_id);
+            Self::set_lock_index(lock_id + 1);
             Self::deposit_event(RawEvent::Created(sender, new_kitty_id));
             Ok(())
         }
@@ -204,12 +208,10 @@ impl<T: Trait> Module<T> {
 
     //获取下一个质押Id
     fn next_lock_index() -> sp_std::result::Result<u32, DispatchError> {
-        let lock_id = Self::lock_index();
-
+        let lock_id: u32 = <LockIndexd>::get();
         if lock_id >= 9999999 {
             return Err(Error::<T>::LockIndexOverflow.into());
         }
-        LockIndex::put(lock_id + 1);
         Ok(lock_id)
     }
 
@@ -359,6 +361,6 @@ impl<T: Trait> Module<T> {
     }
 
     fn set_lock_index(value: u32) {
-        LockIndex::put(value);
+        LockIndexd::put(value);
     }
 }
