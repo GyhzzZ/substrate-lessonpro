@@ -87,8 +87,9 @@ const KittyCard = props => {
                 <KittyAvatar dna={kitty.dna}/>
                 <Message>
                     <Card.Header>ID号:{kitty.id}</Card.Header><br/>
-                    <Card.Meta style={{overflowWrap: 'break-word'}}>基因:{kitty.dna.join(",")}</Card.Meta><br/>
-                    <span style={{overflowWrap: 'break-word'}}>猫奴:{kitty.owner}</span><br/>
+                    <Card.Meta style={{overflowWrap: 'break-word'}}>基因：{kitty.dna.join(",")}</Card.Meta><br/>
+                    <span style={{overflowWrap: 'break-word'}}>猫奴：{kitty.owner}</span><br/>
+                    <br/>
                     <span>{kitty.price}</span><br/>
                 </Message>
             </Card.Content>
