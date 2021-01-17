@@ -45,7 +45,7 @@ export default function Kitties(props) {
                         arr[index].owner = keyring.encodeAddress(all_owner[index].unwrap());
                         arr[index].price =  all_price[index].isEmpty?'未出售':all_price[index].unwrap();
                     })
-                    console.log("all_kitties:", all_kitties)
+                    console.log("all_kitties:", all_kitties);
                     setKitties(all_kitties);
                 }).then(unsub => {
                     unsubscribe = unsub;
@@ -74,7 +74,7 @@ export default function Kitties(props) {
         <Form style={{margin: '1em 0'}}>
             <Form.Field style={{textAlign: 'center'}}>
                 <TxButton
-                    accountPair={accountPair} label='创建小毛孩11' type='SIGNED-TX' setStatus={setStatus}
+                    accountPair={accountPair} label='创建小毛孩' type='SIGNED-TX' setStatus={setStatus}
                     attrs={{
                         palletRpc: 'kittiesModule',
                         callable: 'create',
